@@ -1,12 +1,9 @@
 // src/server.js
+import 'dotenv/config';
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import { createClient } from "@supabase/supabase-js";
+import authRoutes from './routes/auth.routes.js';
 
-
-// Configuración de variables de entorno
-dotenv.config();
 
 // Crear servidor
 const app = express();
@@ -16,28 +13,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Inicializar cliente de Supabase
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
+// Rutas
+app.use('/api/auth', authRoutes);
+
 
 // Ruta de prueba
-app.get("/", async (req, res) => {
-    try {
-        // Hacer una query de prueba a una tabla llamada 'usuarios'
-        const { data, error } = await supabase
-            .from("usuario") // nombre de tu tabla en Supabase
-            .select("*");
-
-        if (error) throw error;
-
-        res.json({
-            message: "Servidor funcionando con Supabase",
-            usuario: data,
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: "Error consultando Supabase" });
-    }
-});
+app.get('/', (req, res) => res.json({ message: 'Servidor funcionando con Supabase' }));
 
 // Levantar servidor
 app.listen(PORT, () => {

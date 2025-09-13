@@ -3,7 +3,7 @@ import 'dotenv/config';
 import express from "express";
 import cors from "cors";
 import authRoutes from './routes/auth.routes.js';
-
+import categoryRoutes from './routes/category.routes.js';
 
 // Crear servidor
 const app = express();
@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/auth', authRoutes);
-
+app.use('/api/categories', categoryRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => res.json({ message: 'Servidor funcionando con Supabase' }));

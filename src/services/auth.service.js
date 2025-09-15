@@ -66,11 +66,6 @@ export class AuthService {
 
         const authUser = authData.user;
 
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password });
-        if (loginError) throw new Error(loginError.message);
-
-        const session = loginData.session;
-
         const { data: newUser, error: insertError } = await supabase
             .from('usuario')
             .insert([{
@@ -86,8 +81,12 @@ export class AuthService {
 
         if (insertError) throw new Error(insertError.message);
 
+        const session = authData.session;
+
         return {
-            message: 'Usuario registrado correctamente',
+            message: session
+                ? 'Usuario registrado y logueado correctamente'
+                : 'Usuario registrado, falta confirmar el correo electrónico',
             user: { id: authUser.id, email: authUser.email },
             profile: newUser,
             access_token: session.access_token,

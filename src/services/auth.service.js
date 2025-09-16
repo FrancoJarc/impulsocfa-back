@@ -2,7 +2,8 @@ import supabase from '../config/supabase.js';
 import supabaseAdmin from '../config/supabaseAdmin.js';
 
 export class AuthService {
-    // Servicio para registro con Google
+ 
+
     static async registerGoogleService(access_token) {
         const { data: userData, error: userError } = await supabase.auth.getUser(access_token);
         if (userError) throw new Error(userError.message);
@@ -20,7 +21,7 @@ export class AuthService {
         if (!existingUser) {
             const { data: newUser, error: insertError } = await supabase
                 .from('usuario')
-                .insert([{
+                .upsert([{
                     id_usuario: user.id,
                     nombre: null,
                     apellido: null,
@@ -32,27 +33,17 @@ export class AuthService {
                 .single();
 
             if (insertError) throw new Error(insertError.message);
-            return { user, profile: newUser };
+            profile = newUser;
         }
-
-        const { data: loginData, error: loginError } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: { accessToken: access_token }
-        });
-
-        if (loginError) throw new Error(loginError.message);
-
-        const session = loginData.session;
 
         return {
             user,
             profile,
-            access_token: session.access_token,
-            refresh_token: session.refresh_token
+            access_token,
         };
     }
 
-    // Servicio para registro normal
+
     static async registerUserService({email,password,nombre,apellido,fecha_nacimiento,foto_perfil = null,nacionalidad}) {
         if (!email || !password || !nombre || !apellido || !nacionalidad) {
             throw new Error('Faltan campos obligatorios');
@@ -102,7 +93,6 @@ export class AuthService {
         if (!access_token) throw new Error("Falta access_token");
         if (!refresh_token) throw new Error("Falta refresh_token");
 
-        // Simplemente devolvemos los tokens al frontend
         return { access_token, refresh_token };
     }
 

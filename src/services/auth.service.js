@@ -17,6 +17,7 @@ export class AuthService {
             .single();
 
         let profile = existingUser;
+        let isNewUser = false;
 
         if (!existingUser) {
             const { data: newUser, error: insertError } = await supabase
@@ -34,12 +35,14 @@ export class AuthService {
 
             if (insertError) throw new Error(insertError.message);
             profile = newUser;
+            isNewUser = true;
         }
 
         return {
             user,
             profile,
             access_token,
+            isNewUser
         };
     }
 

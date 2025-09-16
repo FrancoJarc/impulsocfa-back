@@ -1,4 +1,5 @@
 import supabase from '../config/supabase.js';
+import supabaseAdmin from '../config/supabaseAdmin.js';
 
 export class AuthService {
     // Servicio para registro con Google
@@ -61,7 +62,13 @@ export class AuthService {
             throw new Error('La contraseña debe tener al menos 6 caracteres');
         }
 
-        const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: 'http://localhost:5173/email-confirmed'
+            }
+        });
         if (authError) throw new Error(authError.message);
 
         const authUser = authData.user;
@@ -81,18 +88,24 @@ export class AuthService {
 
         if (insertError) throw new Error(insertError.message);
 
-        const session = authData.session;
 
         return {
-            message: session
-                ? 'Usuario registrado y logueado correctamente'
-                : 'Usuario registrado, falta confirmar el correo electrónico',
+            message: 'Usuario registrado. Revisa tu correo para confirmar tu cuenta.',
             user: { id: authUser.id, email: authUser.email },
-            profile: newUser,
-            access_token: session.access_token,
-            refresh_token: session.refresh_token
+            profile: newUser
         };
     }
+
+
+
+    static async confirmAndLoginService({ access_token, refresh_token }) {
+        if (!access_token) throw new Error("Falta access_token");
+        if (!refresh_token) throw new Error("Falta refresh_token");
+
+        // Simplemente devolvemos los tokens al frontend
+        return { access_token, refresh_token };
+    }
+
 
 
 

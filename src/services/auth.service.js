@@ -87,18 +87,6 @@ export class AuthService {
         };
     }
 
-
-
-    static async confirmAndLoginService({ access_token, refresh_token }) {
-        if (!access_token) throw new Error("Falta access_token");
-        if (!refresh_token) throw new Error("Falta refresh_token");
-
-        return { access_token, refresh_token };
-    }
-
-
-
-
     static async loginUserService({ email, password }) {
         if (!email || !password) {
             throw new Error("Email y contraseña son obligatorios");

@@ -27,19 +27,6 @@ export class AuthController {
         }
     }
 
-
-
-    static async confirmAndLogin(req, res) {
-        try {
-            const tokens = await AuthService.confirmAndLoginService(req.body);
-            return res.json(tokens);
-        } catch (err) {
-            console.error(err);
-            return res.status(500).json({ error: err.message });
-        }
-    }
-
-
     // iniciar sesion
     static async loginUser(req, res) {
         try {

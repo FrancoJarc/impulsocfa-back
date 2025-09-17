@@ -69,7 +69,7 @@ export class AuthService {
 
         const { data: newUser, error: insertError } = await supabase
             .from('usuario')
-            .insert([{
+            .upsert([{
                 id_usuario: authUser.id,
                 nombre,
                 apellido,
@@ -106,6 +106,8 @@ export class AuthService {
 
         const { user, session } = data;
 
+        if (!session) throw new Error("No se pudo iniciar sesión. Verifica tus credenciales");
+              
         return {
             message: "Login exitoso",
             user: {

@@ -23,7 +23,7 @@ export async function authenticate(req, res, next) {
             .eq('id_usuario', authUser.id)
             .single();
 
-        if (dbError || !userData) {
+        if (dbError || !userData) { 
             return res.status(401).json({ error: "Usuario no encontrado en la DB" });
         }
 

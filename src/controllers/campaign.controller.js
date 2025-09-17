@@ -4,7 +4,7 @@ export class CampaignController {
     static async createCampaign(req, res) {
         try {
             const id_usuario = req.user.id; // siempre del token
-            const { id_categoria, titulo, descripcion, foto_principal, tiempo_objetivo, monto_objetivo, fecha_inicio } = req.body;
+            const { id_categoria, titulo, descripcion, foto_principal, tiempo_objetivo, monto_objetivo } = req.body;
 
             // Convertir id_categoria a número y validar
             const categoriaId = Number(id_categoria);
@@ -12,13 +12,12 @@ export class CampaignController {
 
             const campaignData = {
                 id_usuario,
-                id_categoria: categoriaId,
+                id_categoria: 26,
                 titulo,
                 descripcion,
                 foto_principal,
                 tiempo_objetivo,
                 monto_objetivo,
-                fecha_inicio
             };
 
             const campaign = await CampaignService.createCampaignService(campaignData);

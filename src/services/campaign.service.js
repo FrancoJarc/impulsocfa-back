@@ -3,9 +3,9 @@ import supabase from '../config/supabase.js';
 export class CampaignService {
     // Crear campaña
     static async createCampaignService(campaignData) {
-        const { id_usuario, id_categoria, titulo, descripcion, foto_principal, tiempo_objetivo, monto_objetivo, fecha_inicio } = campaignData;
+        const { id_usuario, id_categoria, titulo, descripcion, foto_principal, tiempo_objetivo, monto_objetivo } = campaignData;
 
-        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo || !fecha_inicio) {
+        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo) {
             throw new Error("Faltan datos obligatorios");
         }
 
@@ -29,7 +29,6 @@ export class CampaignService {
                 tiempo_objetivo,
                 monto_objetivo,
                 monto_actual: 0,
-                fecha_inicio,
                 estado: 'pendiente' // siempre pendiente al crear
             }])
             .select()

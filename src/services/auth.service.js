@@ -60,7 +60,7 @@ export class AuthService {
             email,
             password,
             options: {
-                emailRedirectTo: process.env.EMAIL_REDIRECT_URL
+                /*emailRedirectTo: process.env.EMAIL_REDIRECT_URL*/
             }
         });
         if (authError) throw new Error(authError.message);

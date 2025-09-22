@@ -56,8 +56,6 @@ export class AuthService {
             throw new Error('La contraseña debe tener al menos 6 caracteres');
         }
 
-        const redirectUrl = process.env.EMAIL
-
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,

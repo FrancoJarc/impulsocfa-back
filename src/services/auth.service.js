@@ -1,5 +1,6 @@
 import supabase from '../config/supabase.js';
 
+
 export class AuthService {
  
 
@@ -55,11 +56,13 @@ export class AuthService {
             throw new Error('La contraseña debe tener al menos 6 caracteres');
         }
 
+        const redirectUrl = process.env.EMAIL
+
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
             options: {
-                emailRedirectTo: 'http://localhost:5173/email-confirmed'
+                emailRedirectTo: process.env.EMAIL_REDIRECT_URL
             }
         });
         if (authError) throw new Error(authError.message);

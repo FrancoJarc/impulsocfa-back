@@ -13,6 +13,9 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": "20.15.0"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
     "cors": "^2.8.5",

@@ -1,5 +1,4 @@
 import supabase from '../config/supabase.js';
-import supabaseAdmin from '../config/supabaseAdmin.js';
 
 export class AuthService {
  

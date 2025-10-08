@@ -1,9 +1,9 @@
-import express from 'express';
+import { Router } from 'express';
 import { CategoryController } from '../controllers/category.controller.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { authorization } from '../middlewares/authorization.js';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/', CategoryController.getCategories);
 router.post('/', authenticate, authorization("administrador"), CategoryController.createCategory);

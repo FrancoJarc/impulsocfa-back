@@ -1,8 +1,8 @@
-import express from 'express';
+import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller.js';
 import { authenticate } from '../middlewares/authenticate.js';
 
-const router = express.Router();
+const router = Router();
 
 router.post('/google', AuthController.registerGoogle);
 router.post('/register', AuthController.registerUser);

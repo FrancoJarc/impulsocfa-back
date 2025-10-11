@@ -19,7 +19,7 @@ export class AuthController {
     // Registro normal con email/password
     static async registerUser(req, res) {
         try {
-            const result = await AuthService.registerUserService(req.body);
+            const result = await AuthService.registerUserService(req.body, req.file);
             return res.json(result);
         } catch (err) {
             console.error(err);
@@ -39,7 +39,7 @@ export class AuthController {
     }
 
 
-    //obtener la llave maestra
+
     static async getLlaveMaestra(req, res) {
         try {
             const userId = req.user.id;

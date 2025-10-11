@@ -1,4 +1,6 @@
 import supabase from '../config/supabase.js';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 export class AuthService {
@@ -47,7 +49,7 @@ export class AuthService {
     }
 
 
-    static async registerUserService({email,password,nombre,apellido,fecha_nacimiento,foto_perfil = null,nacionalidad}) {
+    static async registerUserService({email,password,nombre,apellido,fecha_nacimiento,nacionalidad}, file) {
         if (!email || !password || !nombre || !apellido || !nacionalidad) {
             throw new Error('Faltan campos obligatorios');
         }
@@ -63,9 +65,40 @@ export class AuthService {
                 emailRedirectTo: process.env.EMAIL_REDIRECT_URL
             }
         });
-        if (authError) throw new Error(authError.message);
+        if (authError) throw new Error("Error creando usuario en auth: " + authError.message);
 
         const authUser = authData.user;
+
+        let foto_perfil_url = null;
+
+        /*if (file) {
+            try {
+                const fileExt = file.originalname.split(".").pop();
+                const fileName = `${uuidv4()}.${fileExt}`;
+
+                console.log("Archivo recibido:", file.originalname, file.mimetype, file.size);
+
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from("foto_usuarios") 
+                    .upload(`perfiles/${fileName}`, file.buffer, {
+                        contentType: file.mimetype,
+                        upsert: false,
+                    });
+                console.log("Subida completada:", uploadData);
+
+                if (uploadError) throw new Error("Error subiendo la foto: " + uploadError.message);
+
+                // Obtener URL pública
+                const { data: publicUrl } = supabase.storage
+                    .from("foto_usuarios")
+                    .getPublicUrl(`perfiles/${fileName}`);
+
+                foto_perfil_url = publicUrl.publicUrl;
+            } catch (err) {
+                throw new Error("Error subiendo la foto de perfil: " + err.message);
+            }
+        }*/
+
 
         const { data: newUser, error: insertError } = await supabase
             .from('usuario')
@@ -74,13 +107,13 @@ export class AuthService {
                 nombre,
                 apellido,
                 fecha_nacimiento,
-                foto_perfil,
+                foto_perfil: foto_perfil_url,
                 nacionalidad
             }])
             .select()
             .single();
 
-        if (insertError) throw new Error(insertError.message);
+        if (insertError) throw new Error("Error creando usuario en DB: " + insertError.message);
 
 
         return {
@@ -89,6 +122,9 @@ export class AuthService {
             profile: newUser
         };
     }
+
+
+
 
     static async loginUserService({ email, password }) {
         if (!email || !password) {
@@ -108,11 +144,23 @@ export class AuthService {
 
         if (!session) throw new Error("No se pudo iniciar sesión. Verifica tus credenciales");
               
+        const { data: profileData, error: profileError } = await supabase
+            .from("usuario")
+            .select("*")
+            .eq("id_usuario", user.id)
+            .single();  
+
+        if (profileError) {
+            throw new Error("Error obteniendo perfil del usuario");
+        }
+
+
         return {
             message: "Login exitoso",
             user: {
                 id: user.id,
-                email: user.email
+                email: user.email,
+                ...profileData
             },
             access_token: session.access_token,
             refresh_token: session.refresh_token

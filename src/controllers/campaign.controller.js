@@ -106,14 +106,22 @@ export class CampaignController {
             const campaign = await CampaignService.getCampaignByIdService(id);
             if (!campaign) return res.status(404).json({ error: "Campaña no encontrada" });
 
-            if (req.user.rol !== 'administrador') {
-                return res.status(403).json({ error: "No tenés permiso para aprobar/rechazar campañas" });
-            }
-
             const updatedCampaign = await CampaignService.approveCampaignService(id, estado);
             return res.status(200).json(updatedCampaign);
         } catch (err) {
             return res.status(400).json({ error: err.message });
         }
     }
+
+
+
+    static async getPendingCampaigns(req, res) {
+        try {
+            const campaigns = await CampaignService.getPendingCampaignsService();
+            return res.status(200).json(campaigns);
+        } catch (err) {
+            return res.status(400).json({ error: err.message });
+        }
+    }
+
 }

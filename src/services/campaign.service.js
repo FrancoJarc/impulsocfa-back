@@ -122,4 +122,16 @@ export class CampaignService {
 
         return data;
     }
+
+
+    // Para filtrar por campañas pendientes
+    static async getPendingCampaignsService() {
+        const { data, error } = await supabase
+            .from('campana')
+            .select('*')
+            .eq('estado', 'pendiente');
+
+        if (error) throw new Error(error.message);
+        return data;
+    }
 }

@@ -8,6 +8,9 @@ const router = Router();
 // Listar todas las campañas aprobadas
 router.get('/', CampaignController.getCampaigns);
 
+// Obtener campaña con estado "pendiente"
+router.get('/pending', authenticate, authorization("administrador"), CampaignController.getPendingCampaigns);
+
 // Obtener campaña por ID
 router.get('/:id', authenticate, CampaignController.getCampaignById);
 
@@ -22,5 +25,6 @@ router.delete('/:id', authenticate, CampaignController.deleteCampaign);
 
 // Aprobar/rechazar campaña (solo admin)
 router.patch('/:id/approve', authenticate, authorization("administrador"), CampaignController.approveCampaign);
+
 
 export default router;

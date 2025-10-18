@@ -1,5 +1,6 @@
 import supabase from '../config/supabase.js';
 import { v4 as uuidv4 } from 'uuid';
+import supabaseAdmin from '../config/supabaseAdmin.js';
 
 
 
@@ -71,20 +72,17 @@ export class AuthService {
 
         let foto_perfil_url = null;
 
-        /*if (file) {
+        if (file) {
             try {
                 const fileExt = file.originalname.split(".").pop();
                 const fileName = `${uuidv4()}.${fileExt}`;
 
-                console.log("Archivo recibido:", file.originalname, file.mimetype, file.size);
-
-                const { data: uploadData, error: uploadError } = await supabase.storage
+                const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
                     .from("foto_usuarios") 
                     .upload(`perfiles/${fileName}`, file.buffer, {
                         contentType: file.mimetype,
                         upsert: false,
                     });
-                console.log("Subida completada:", uploadData);
 
                 if (uploadError) throw new Error("Error subiendo la foto: " + uploadError.message);
 
@@ -97,7 +95,7 @@ export class AuthService {
             } catch (err) {
                 throw new Error("Error subiendo la foto de perfil: " + err.message);
             }
-        }*/
+        }
 
 
         const { data: newUser, error: insertError } = await supabase

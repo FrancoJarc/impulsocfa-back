@@ -198,35 +198,29 @@ export class AuthService {
 
 
 
-    static async changePasswordService(userId, llave_maestra, newPassword) {
-        // 1. Buscar usuario en la tabla
+    static async changePasswordService(llave_maestra, newPassword) {
+
         const { data: userRecord, error: dbError } = await supabase
             .from("usuario")
-            .select("llave_maestra")
-            .eq("id_usuario", userId)
+            .select("id_usuario, llave_maestra")
+            .eq("llave_maestra", llave_maestra)
             .single();
-
+        
         if (dbError || !userRecord) {
-            throw new Error("Usuario no encontrado");
-        }
-
-        // 2. Validar llave maestra
-        if (userRecord.llave_maestra !== llave_maestra) {
             throw new Error("La llave maestra es incorrecta");
         }
 
-        // 3. Validar nueva contraseña
         if (newPassword.length < 6) {
             throw new Error("La contraseña debe tener al menos 6 caracteres");
         }
 
-        // 4. Actualizar contraseña en Supabase Auth
-        const { data, error } = await supabase.auth.updateUser({
-            password: newPassword
-        });
+        const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+            userRecord.id_usuario,
+            { password: newPassword }
+        );
 
         if (error) {
-            throw new Error(error.message);
+            throw new Error(`Error actualizando contraseña: ${error.message}`);
         }
 
         return { message: "Contraseña actualizada correctamente" };

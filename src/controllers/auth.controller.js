@@ -67,14 +67,13 @@ export class AuthController {
 
     static async changePassword(req, res) {
         try {
-            const userId = req.user.id; // viene del token
             const { llave_maestra, newPassword } = req.body;
 
             if (!llave_maestra || !newPassword) {
                 return res.status(400).json({ error: "Faltan campos obligatorios" });
             }
 
-            const result = await AuthService.changePasswordService(userId, llave_maestra, newPassword);
+            const result = await AuthService.changePasswordService(llave_maestra, newPassword);
             return res.status(200).json(result);
 
         } catch (err) {

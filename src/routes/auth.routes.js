@@ -10,6 +10,6 @@ router.post('/register', upload.single("foto_perfil") ,AuthController.registerUs
 router.post("/login", AuthController.loginUser);
 router.get('/usuario/llave',authenticate, AuthController.getLlaveMaestra);
 router.post('/logout',authenticate, AuthController.logoutUser);
-router.post('/change-password', authenticate, AuthController.changePassword);
+router.post('/change-password', AuthController.changePassword);
 
 export default router;

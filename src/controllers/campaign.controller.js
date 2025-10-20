@@ -4,23 +4,22 @@ export class CampaignController {
     static async createCampaign(req, res) {
         try {
             const id_usuario = req.user.id; // siempre del token
-            const { id_categoria, titulo, descripcion, foto_principal, tiempo_objetivo, monto_objetivo } = req.body;
+            const { id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo } = req.body;
 
-            // Convertir id_categoria a número y validar
+            /*// Convertir id_categoria a número y validar
             const categoriaId = Number(id_categoria);
-            if (isNaN(categoriaId)) throw new Error("Categoría inválida");
+            if (isNaN(categoriaId)) throw new Error("Categoría inválida");*/
 
-            const campaignData = {
+            const campaign = await CampaignService.createCampaignService({
                 id_usuario,
-                id_categoria: 26,
+                id_categoria,
                 titulo,
                 descripcion,
-                foto_principal,
                 tiempo_objetivo,
                 monto_objetivo,
-            };
+                file: req.file, // la imagen viene en memoria gracias a multer
+            });
 
-            const campaign = await CampaignService.createCampaignService(campaignData);
             return res.status(201).json(campaign);
         } catch (err) {
             console.error(err);
@@ -57,7 +56,7 @@ export class CampaignController {
             if (!campaign) return res.status(404).json({ error: "Campaña no encontrada" });
 
             // Solo dueño o admin
-            if (req.user.id !== campaign.id_usuario && req.user.rol !== 'administrador') {
+            if (req.user.id !== campaign.id_usuario && req.user.rol !== "administrador") {
                 return res.status(403).json({ error: "No tenés permiso para actualizar esta campaña" });
             }
 
@@ -65,20 +64,23 @@ export class CampaignController {
 
             let updateData = {};
             if (hasDonations) {
-                // Solo se pueden editar título y descripción
                 const { titulo, descripcion } = req.body;
-                updateData = { titulo, descripcion, estado: 'pendiente' }; // requiere aprobación admin
+                updateData = { titulo, descripcion, estado: "pendiente" }; // requiere aprobación admin
             } else {
                 updateData = req.body;
             }
 
-            const updatedCampaign = await CampaignService.updateCampaignService(id, updateData);
+            // 🔹 Pasamos el file al service directamente
+            const updatedCampaign = await CampaignService.updateCampaignService(id, updateData, req.file);
+
             return res.status(200).json(updatedCampaign);
         } catch (err) {
+            console.error(err);
             return res.status(400).json({ error: err.message });
         }
     }
 
+    
     static async deleteCampaign(req, res) {
         try {
             const { id } = req.params;

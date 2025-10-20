@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { CampaignController } from '../controllers/campaign.controller.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { authorization } from '../middlewares/authorization.js';
+import { upload } from '../middlewares/upload.middleware.js';
 
 const router = Router();
 
@@ -15,10 +16,10 @@ router.get('/pending', authenticate, authorization("administrador"), CampaignCon
 router.get('/:id', authenticate, CampaignController.getCampaignById);
 
 // Crear campaña (usuario logueado)
-router.post('/', authenticate, CampaignController.createCampaign);
+router.post('/', authenticate, upload.single("foto_principal"), CampaignController.createCampaign);
 
 // Editar campaña (dueño o admin)
-router.put('/:id', authenticate, CampaignController.updateCampaign);
+router.put('/:id', authenticate, upload.single("foto_principal"), CampaignController.updateCampaign);
 
 // “Eliminar” campaña → cambiar estado a suspendida (dueño o admin)
 router.delete('/:id', authenticate, CampaignController.deleteCampaign);

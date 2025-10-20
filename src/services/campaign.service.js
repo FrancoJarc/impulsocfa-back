@@ -1,12 +1,35 @@
 import supabase from '../config/supabase.js';
+import supabaseAdmin from '../config/supabaseAdmin.js';
 
 export class CampaignService {
+
+    static async uploadImageToStorage(file) {
+        if (!file) return null;
+
+        const fileName = `${Date.now()}-${file.originalname}`;
+        const { error } = await supabaseAdmin.storage
+            .from("campaign-photos")
+            .upload(fileName, file.buffer, { contentType: file.mimetype });
+
+        if (error) {
+            console.error("Supabase upload error:", error);
+            throw new Error("Error subiendo la imagen");
+        }
+
+        const { data: publicUrl } = supabaseAdmin
+            .storage
+            .from("campaign-photos")
+            .getPublicUrl(fileName);
+
+        return publicUrl.publicUrl;
+    }
+
     // Crear campaña
     static async createCampaignService(campaignData) {
-        const { id_usuario, id_categoria, titulo, descripcion, foto_principal, tiempo_objetivo, monto_objetivo } = campaignData;
+        const { id_usuario, id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo, file } = campaignData;
 
-        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo) {
-            throw new Error("Faltan datos obligatorios");
+        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo || !file) {
+            throw new Error("Todos los campos son obligatorios");
         }
 
         // Validar categoría
@@ -17,6 +40,8 @@ export class CampaignService {
             .single();
 
         if (!categoria || catError) throw new Error("Categoría inválida");
+
+        const foto_principal = await this.uploadImageToStorage(file);
 
         const { data, error } = await supabase
             .from('campana')
@@ -78,10 +103,39 @@ export class CampaignService {
     }
 
     // Editar campaña
-    static async updateCampaignService(id_campana, campaignData) {
+    static async updateCampaignService(id_campana, campaignData, file) {
+        // 1️⃣ Obtener la campaña actual (para conocer la imagen vieja)
+        const { data: currentCampaign, error: fetchError } = await supabase
+            .from('campana')
+            .select('foto_principal')
+            .eq('id_campana', id_campana)
+            .single();
+
+        if (fetchError) throw new Error(fetchError.message);
+
+        let updateData = { ...campaignData };
+
+        // 2️⃣ Si hay nueva imagen, borrar la vieja y subir la nueva
+        if (file) {
+            // Si existe imagen anterior, eliminarla del bucket
+            if (currentCampaign?.foto_principal) {
+                try {
+                    const oldPath = currentCampaign.foto_principal.split('/').pop(); // obtener nombre del archivo
+                    await supabaseAdmin.storage.from('campaign-photos').remove([oldPath]);
+                } catch (err) {
+                    console.warn("No se pudo eliminar la imagen anterior:", err.message);
+                }
+            }
+
+            // Subir la nueva imagen
+            const newImageUrl = await this.uploadImageToStorage(file);
+            updateData.foto_principal = newImageUrl;
+        }
+
+        // 3️⃣ Actualizar la campaña
         const { data, error } = await supabase
             .from('campana')
-            .update(campaignData)
+            .update(updateData)
             .eq('id_campana', id_campana)
             .select()
             .single();

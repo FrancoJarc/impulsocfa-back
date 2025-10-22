@@ -188,4 +188,33 @@ export class CampaignService {
         if (error) throw new Error(error.message);
         return data;
     }
+
+
+    // Para filtrar por campañas pendientes del usuario logueado
+    static async getUserPendingCampaignsService(id_usuario) {
+        const { data, error } = await supabase
+            .from('campana')
+            .select('*')
+            .eq('estado', 'pendiente')
+            .eq('id_usuario', id_usuario);
+
+        if (error) throw new Error(error.message);
+
+        return data;
+    }
+
+
+
+    static async getUserRejectedCampaignsService(id_usuario) {
+        const { data, error } = await supabase
+            .from('campana')
+            .select('*')
+            .eq('estado', 'rechazada')
+            .eq('id_usuario', id_usuario);
+
+        if (error) throw new Error(error.message);
+
+        return data;
+    }
+
 }

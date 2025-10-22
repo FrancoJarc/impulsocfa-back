@@ -126,4 +126,31 @@ export class CampaignController {
         }
     }
 
+
+
+    static async getUserPendingCampaigns(req, res) {
+        try {
+            const id_usuario = req.user.id; // viene del token
+            const campaigns = await CampaignService.getUserPendingCampaignsService(id_usuario);
+            return res.status(200).json(campaigns);
+        } catch (err) {
+            console.error(err);
+            return res.status(400).json({ error: err.message });
+        }
+    }
+
+
+
+    static async getUserRejectedCampaigns(req, res) {
+        try {
+            const id_usuario = req.user.id; // viene del token
+            const campaigns = await CampaignService.getUserRejectedCampaignsService(id_usuario);
+            return res.status(200).json(campaigns);
+        } catch (err) {
+            console.error(err);
+            return res.status(400).json({ error: err.message });
+        }
+    }
+
+
 }

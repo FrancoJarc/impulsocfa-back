@@ -15,6 +15,12 @@ router.get('/pending', authenticate, authorization("administrador"), CampaignCon
 // Obtener campaña por ID
 router.get('/:id', authenticate, CampaignController.getCampaignById);
 
+// Obtener campañas pendientes del usuario logueado
+router.get('/pending/user', authenticate, CampaignController.getUserPendingCampaigns);
+
+// Obtener campañas rechazadas del usuario logueado
+router.get('/rejected/user', authenticate, CampaignController.getUserRejectedCampaigns);
+
 // Crear campaña (usuario logueado)
 router.post('/', authenticate, upload.single("foto_principal"), CampaignController.createCampaign);
 

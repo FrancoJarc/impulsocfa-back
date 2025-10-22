@@ -7,6 +7,7 @@ import categoryRoutes from './routes/category.routes.js';
 import campaignRoutes from './routes/campaign.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import userRoutes from './routes/user.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
 
 // Crear servidor
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => res.json({ message: 'Servidor funcionando con Supabase' }));

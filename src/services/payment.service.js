@@ -1,5 +1,6 @@
 import { Preference, MercadoPagoConfig } from "mercadopago";
 import dotenv from "dotenv";
+import supabase from "../config/supabase.js";
 
 dotenv.config();
 
@@ -22,17 +23,19 @@ export class PaymentService {
                     },
                 ],
                 back_urls: {
-                    success: "http://localhost:5173/pago-exitoso",
-                    failure: "http://localhost:5173/pago-fallido",
-                    pending: "http://localhost:5173/pago-pendiente",
+                    success: "https://example.com/success",
+                    failure: "https://example.com/failure",
+                    pending: "https://example.com/pending",
                 },
-                auto_return: "approved",
+                auto_return: null,
                 external_reference: JSON.stringify({ campaignId, userId }),
             };
 
             const response = await preference.create({ body });
+            console.log("Preferencia creada (sandbox):", response);
             return response.id; // ID de la preferencia
         } catch (error) {
+            console.error("Error al crear preferencia:", error);
             throw new Error(error.message);
         }
     }
@@ -41,37 +44,44 @@ export class PaymentService {
 
 
     static async handleWebhook(paymentId) {
-        const payment = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-            headers: {
-                Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
-            },
-        }).then((res) => res.json());
+        try {
+            const payment = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`,
+                },
+            }).then((res) => res.json());
 
-        // Datos útiles
-        const { status, transaction_amount, payment_method_id, external_reference, id } = payment;
+            const { status, transaction_amount, payment_method_id, external_reference, id, receipt_url } = payment;
 
-        // Recuperar los IDs guardados en external_reference
-        const { campaignId, userId } = JSON.parse(external_reference);
+            const { campaignId, userId } = JSON.parse(external_reference);
 
-        // 1️⃣ Insertar en donacion
-        const { data: donacion } = await supabase
-            .from("donacion")
-            .insert({
-                id_campana: campaignId,
-                id_usuario: userId,
-                monto: transaction_amount,
-            })
-            .select()
-            .single();
+            // Guardar en la tabla donacion
+            const { data: donacion, error: donacionError } = await supabase
+                .from("donacion")
+                .insert({
+                    id_campana: campaignId,
+                    id_usuario: userId,
+                    monto: transaction_amount,
+                })
+                .select()
+                .single();
 
-        // 2️⃣ Insertar en pago
-        await supabase.from("pago").insert({
-            id_donacion: donacion.id_donacion,
-            codigo_transaccion: id.toString(),
-            metodo: payment_method_id,
-            estado: status,
-            comprobante: payment.receipt_url || "",
-        });
+            if (donacionError) throw new Error(donacionError.message);
+
+            // Guardar en la tabla pago
+            const { error: pagoError } = await supabase.from("pago").insert({
+                id_donacion: donacion.id_donacion,
+                codigo_transaccion: id.toString(),
+                metodo: payment_method_id,
+                estado: status,
+                comprobante: receipt_url || "",
+            });
+
+            if (pagoError) throw new Error(pagoError.message);
+        } catch (error) {
+            console.error("Error en handleWebhook:", error);
+            throw error;
+        }
     }
 
 }

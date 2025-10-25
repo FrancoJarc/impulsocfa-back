@@ -23,11 +23,11 @@ export class PaymentService {
                     },
                 ],
                 back_urls: {
-                    success: "https://example.com/success",
-                    failure: "https://example.com/failure",
-                    pending: "https://example.com/pending",
+                    success: "http://localhost:5173/pago-exitoso",
+                    failure: "http://localhost:5173/pago-fallido",
+                    pending: "http://localhost:5173/pago-pendiente",
                 },
-                auto_return: null,
+               
                 external_reference: JSON.stringify({ campaignId, userId }),
             };
 

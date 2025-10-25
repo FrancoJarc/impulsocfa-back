@@ -10,7 +10,7 @@ export class PaymentController {
                 campaignId,
                 userId,
             });
-            return res.status(200).json({ preferenceId });
+            return res.status(200).json({ id: preferenceId });
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }

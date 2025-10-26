@@ -23,11 +23,13 @@ export class PaymentService {
                     },
                 ],
                 back_urls: {
-                    success: "http://localhost:5173/pago-exitoso",
-                    failure: "http://localhost:5173/pago-fallido",
-                    pending: "http://localhost:5173/pago-pendiente",
+                    success: "https://impulsocfa-front.vercel.app/pago-exitoso",
+                    failure: "https://impulsocfa-front.vercel.app/pago-fallido",
+                    pending: "https://impulsocfa-front.vercel.app/pago-pendiente",
+                    
                 },
-               
+                notification_url: `https://impulsocfa-back.onrender.com/api/payments/webhook`, 
+                auto_return: "approved",
                 external_reference: JSON.stringify({ campaignId, userId }),
             };
 

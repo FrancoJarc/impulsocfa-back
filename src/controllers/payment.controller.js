@@ -27,10 +27,10 @@ export class PaymentController {
                 await PaymentService.handleWebhook(payment.data.id);
             }
 
-            res.sendStatus(200);
+            return res.sendStatus(200);
         } catch (error) {
             console.error("Error en webhook:" , error);
-            res.sendStatus(500).json({ error: error.message });
+            return res.status(500).json({ error: error.message });
         }
     }
 

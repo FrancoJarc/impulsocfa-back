@@ -54,8 +54,9 @@ export class PaymentService {
             }).then((res) => res.json());
 
             const { status, transaction_amount, payment_method_id, external_reference, id, receipt_url } = payment;
-
             const { campaignId, userId } = JSON.parse(external_reference);
+
+            console.log("🧾 Webhook recibido:", { paymentId, status, campaignId, userId });
 
             // Guardar en la tabla donacion
             const { data: donacion, error: donacionError } = await supabase
@@ -65,21 +66,34 @@ export class PaymentService {
                     id_usuario: userId,
                     monto: transaction_amount,
                 })
-                .select()
+                .select("id_donacion") 
                 .single();
 
-            if (donacionError) throw new Error(donacionError.message);
+            if (donacionError) {
+                console.error("❌ Error al insertar donación:", donacionError);
+                throw new Error(donacionError.message);
+            }
+            
+
+            const donacionId = donacionData.id_donacion;
+            console.log("✅ Donación creada con ID:", donacionId);
 
             // Guardar en la tabla pago
             const { error: pagoError } = await supabase.from("pago").insert({
-                id_donacion: donacion.id_donacion,
+                id_donacion: donacionId,
                 codigo_transaccion: id.toString(),
                 metodo: payment_method_id,
                 estado: status,
                 comprobante: receipt_url || "",
             });
 
-            if (pagoError) throw new Error(pagoError.message);
+            if (pagoError) {
+                console.error("❌ Error al insertar pago:", pagoError);
+                throw new Error(pagoError.message);
+            }
+
+            console.log("💰 Pago insertado correctamente.");
+            
         } catch (error) {
             console.error("Error en handleWebhook:", error);
             throw error;

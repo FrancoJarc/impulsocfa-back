@@ -29,10 +29,9 @@ export class PaymentController {
 
             res.sendStatus(200);
         } catch (error) {
-            console.error("Error en webhook:" , error);;
+            console.error("Error en webhook:" , error);
+            res.sendStatus(500).json({ error: error.message });
         }
     }
 
 }
-
-            res.sendStatus(500).json({ error: error.message })

@@ -75,7 +75,7 @@ export class PaymentService {
             }
             
 
-            const donacionId = donacionData.id_donacion;
+            const donacionId = donacion.id_donacion;
             console.log("✅ Donación creada con ID:", donacionId);
 
             // Guardar en la tabla pago
@@ -93,7 +93,7 @@ export class PaymentService {
             }
 
             console.log("💰 Pago insertado correctamente.");
-            
+
         } catch (error) {
             console.error("Error en handleWebhook:", error);
             throw error;

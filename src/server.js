@@ -19,14 +19,6 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
 }));
-
-// 💡 importante: habilitar preflight
-app.options("*", cors({
-    origin: "https://impulsocfa-front.vercel.app",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-}));
-
 app.use(express.json());
 
 
@@ -40,6 +32,11 @@ app.use("/api/payments", paymentRoutes);
 
 // Ruta de prueba
 app.get('/', (req, res) => res.json({ message: 'Servidor funcionando con Supabase' }));
+
+// Fallback 404 para rutas no encontradas
+app.all('*', (req, res) => {
+    res.status(404).json({ message: 'Ruta no encontrada' });
+});
 
 // Levantar servidor
 app.listen(PORT, () => {

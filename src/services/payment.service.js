@@ -89,7 +89,7 @@ export class PaymentService {
             console.log("✅ Donación creada con ID:", donacionId);
 
             // ✅ Crear registro de pago
-            const receiptUrl = `https://www.mercadopago.com.ar/payments/${id}`;
+            const receiptUrl = `https://www.mercadopago.com.ar/tools/receipt-view/${id}?origin=activities`;
 
             const { error: pagoError } = await supabase.from("pago").insert({
                 id_donacion: donacionId,

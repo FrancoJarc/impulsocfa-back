@@ -34,7 +34,7 @@ app.use("/api/payments", paymentRoutes);
 app.get('/', (req, res) => res.json({ message: 'Servidor funcionando con Supabase' }));
 
 // Fallback 404 para rutas no encontradas
-app.all('*', (req, res) => {
+app.all('/*', (req, res) => {
     res.status(404).json({ message: 'Ruta no encontrada' });
 });
 

@@ -46,44 +46,34 @@ export class PaymentService {
 
     static async handleWebhook(paymentId) {
         try {
-            // Obtener detalles del pago desde Mercado Pago
             const payment = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
                 headers: { Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
             }).then(res => res.json());
 
-            const { status: mpStatus, transaction_amount, payment_method_id, external_reference, id, receipt_url } = payment;
+            console.log("📦 Pago completo recibido de Mercado Pago:", payment);
+
+            const { status, transaction_amount, payment_method_id, external_reference, id, receipt_url } = payment;
             const { campaignId, userId } = JSON.parse(external_reference);
 
-            console.log("🧾 Webhook recibido:", { paymentId, mpStatus, campaignId, userId });
+            // ✅ Solo continuar si el pago fue aprobado
+            if (status !== "approved") {
+                console.log("⚠️ Pago no aprobado, se ignora.");
+                return;
+            }
 
-            // Mapear estado de Mercado Pago a enum de tu DB
-            const estadoMap = {
-                approved: "aprobado",
-                pending: "pendiente",
-                rejected: "rechazado",
-                refunded: "reembolsado",
-                cancelled: "cancelado",
-                in_process: "procesando"
-            };
-            const estado = estadoMap[mpStatus] || "pendiente";
-
-            // Verificar si el pago ya fue registrado
+            // ✅ Verificar si el pago ya fue registrado
             const { data: existingPayment } = await supabase
                 .from("pago")
                 .select("id_pago")
                 .eq("codigo_transaccion", id.toString())
-                .single();
+                .maybeSingle();
 
             if (existingPayment) {
-                console.log("⚠️ Pago ya registrado, actualizando estado si es necesario");
-                await supabase
-                    .from("pago")
-                    .update({ estado, comprobante: receipt_url || "" })
-                    .eq("id_pago", existingPayment.id_pago);
+                console.log("⚠️ Pago ya registrado, se ignora.");
                 return;
             }
 
-            // Crear nueva donación
+            // ✅ Crear nueva donación
             const { data: donacion, error: donacionError } = await supabase
                 .from("donacion")
                 .insert({
@@ -98,12 +88,12 @@ export class PaymentService {
             const donacionId = donacion.id_donacion;
             console.log("✅ Donación creada con ID:", donacionId);
 
-            // Crear registro de pago
+            // ✅ Crear registro de pago
             const { error: pagoError } = await supabase.from("pago").insert({
                 id_donacion: donacionId,
                 codigo_transaccion: id.toString(),
                 metodo: payment_method_id,
-                estado,
+                estado: status, 
                 comprobante: receipt_url || "",
             });
 
@@ -117,5 +107,7 @@ export class PaymentService {
     }
 
     
+
+
 }
 

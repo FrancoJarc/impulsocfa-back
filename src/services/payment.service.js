@@ -50,8 +50,6 @@ export class PaymentService {
                 headers: { Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}` },
             }).then(res => res.json());
 
-            console.log("📦 Pago completo recibido de Mercado Pago:", payment);
-
             const { status, transaction_amount, payment_method_id, external_reference, id, receipt_url } = payment;
             const { campaignId, userId } = JSON.parse(external_reference);
 
@@ -69,7 +67,7 @@ export class PaymentService {
                 .maybeSingle();
 
             if (existingPayment) {
-                console.log("⚠️ Pago ya registrado, se ignora.");
+                console.log("⚠️ Pago ya registrado");
                 return;
             }
 
@@ -86,7 +84,6 @@ export class PaymentService {
 
             if (donacionError) throw new Error(donacionError.message);
             const donacionId = donacion.id_donacion;
-            console.log("✅ Donación creada con ID:", donacionId);
 
             // ✅ Crear registro de pago
             const receiptUrl = `https://www.mercadopago.com.ar/tools/receipt-view/${id}?origin=activities`;
@@ -100,7 +97,25 @@ export class PaymentService {
             });
 
             if (pagoError) throw new Error(pagoError.message);
-            console.log("💰 Pago insertado correctamente.");
+
+
+            // ✅ Actualizar el monto_actual de la campaña
+            const { data: campaignData, error: fetchError } = await supabase
+                .from("campana")
+                .select("monto_actual")
+                .eq("id_campana", campaignId)
+                .single();
+            
+            if (fetchError) throw new Error(fetchError.message);
+
+            const nuevoMonto = Number(campaignData.monto_actual) + Number(transaction_amount);
+
+            const { error: updateError } = await supabase
+                .from("campana")
+                .update({ monto_actual: nuevoMonto })
+                .eq("id_campana", campaignId);
+            
+            if (updateError) throw new Error(updateError.message);
 
         } catch (error) {
             console.error("Error en handleWebhook:", error);

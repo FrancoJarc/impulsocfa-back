@@ -73,7 +73,7 @@ export class PaymentService {
                 return;
             }
 
-            // ✅ Crear nueva donación
+            // ✅ crear nueva donación
             const { data: donacion, error: donacionError } = await supabase
                 .from("donacion")
                 .insert({
@@ -89,12 +89,14 @@ export class PaymentService {
             console.log("✅ Donación creada con ID:", donacionId);
 
             // ✅ Crear registro de pago
+            const receiptUrl = `https://www.mercadopago.com.ar/payments/${id}`;
+
             const { error: pagoError } = await supabase.from("pago").insert({
                 id_donacion: donacionId,
                 codigo_transaccion: id.toString(),
                 metodo: payment_method_id,
-                estado: status, 
-                comprobante: receipt_url || "",
+                estado: "aprobado",
+                comprobante: receiptUrl,
             });
 
             if (pagoError) throw new Error(pagoError.message);

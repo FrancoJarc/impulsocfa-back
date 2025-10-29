@@ -83,15 +83,26 @@ export class CampaignService {
 
     // Obtener campaña por ID
     static async getCampaignByIdService(id_campana) {
-        const { data, error } = await supabase
+        const { data: campaign, error: fetchError } = await supabase
             .from('campana')
             .select('*')
             .eq('id_campana', id_campana)
             .single();
 
-        if (error) throw new Error(error.message);
+        if (fetchError) throw new Error(fetchError.message);
 
-        return data;
+        // 2️⃣ Verificar si tiene donaciones
+        const { data: donations, error: donationsError } = await supabase
+            .from('donacion')
+            .select('id_donacion')
+            .eq('id_campana', id_campana);
+
+        if (donationsError) throw new Error(donationsError.message);
+
+        return {
+            ...campaign,
+            hasDonations: donations.length > 0,
+        };
     }
 
     // Verificar si la campaña tiene donaciones

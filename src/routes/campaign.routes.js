@@ -13,7 +13,7 @@ router.get('/', CampaignController.getCampaigns);
 router.get('/pending', authenticate, authorization("administrador"), CampaignController.getPendingCampaigns);
 
 // Obtener campaña por ID
-router.get('/:id', authenticate, CampaignController.getCampaignById);
+router.get('/:id', CampaignController.getCampaignById);
 
 // Obtener campañas pendientes del usuario logueado
 router.get('/pending/user', authenticate, CampaignController.getUserPendingCampaigns);

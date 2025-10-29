@@ -71,6 +71,10 @@ export class CampaignService {
         if (filters.id_categoria) query = query.eq('id_categoria', filters.id_categoria);
         if (filters.id_usuario) query = query.eq('id_usuario', filters.id_usuario);
 
+        if (filters.q && filters.q.length >= 3) {
+            query = query.ilike('titulo', `%${filters.q}%`);
+        }
+
         const { data, error } = await query;
         if (error) throw new Error(error.message);
 
@@ -216,5 +220,9 @@ export class CampaignService {
 
         return data;
     }
+
+
+
+
 
 }

@@ -11,4 +11,16 @@ export class UserController {
             return res.status(400).json({ error: err.message });
         }
     }
+
+
+    static async disableAccount(req, res) {
+        try {
+            const id_usuario = req.user.id; // viene del token
+            const disableUser = await UserService.disableAccountService(id_usuario);
+            return res.status(200).json(disableUser);
+        } catch (err) {
+            console.error(err);
+            return res.status(400).json({ error: err.message });
+        }
+    }
 }

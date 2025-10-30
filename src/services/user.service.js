@@ -47,4 +47,22 @@ export class UserService {
         if (error) throw new Error(error.message);
         return data;
     }
+
+
+
+    static async disableAccountService(id_usuario) {
+        const { data, error } = await supabase
+            .from("usuario")
+            .update({
+                estado_cuenta: "deshabilitada",
+            })
+            .eq("id_usuario", id_usuario)
+            .select()
+            .single();
+
+        if (error) throw new Error(error.message);
+        return data;
+    }
+
+
 }

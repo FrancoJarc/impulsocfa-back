@@ -5,8 +5,6 @@ import supabaseAdmin from '../config/supabaseAdmin.js';
 
 
 export class AuthService {
- 
-
     static async registerGoogleService(access_token) {
         const { data: userData, error: userError } = await supabase.auth.getUser(access_token);
         if (userError) throw new Error(userError.message);
@@ -30,7 +28,7 @@ export class AuthService {
                     nombre: null,
                     apellido: null,
                     fecha_nacimiento: null,
-                    foto_perfil: null,
+                    foto_perfil: user.user_metadata?.avatar_url || "https://kweqoqguupwxgbwavyfb.supabase.co/storage/v1/object/public/foto_usuarios/perfiles/default.jpg",
                     nacionalidad: null
                 }])
                 .select()
@@ -70,7 +68,7 @@ export class AuthService {
 
         const authUser = authData.user;
 
-        let foto_perfil_url = null;
+        let foto_perfil_url = "https://kweqoqguupwxgbwavyfb.supabase.co/storage/v1/object/public/foto_usuarios/perfiles/default.jpg";
 
         if (file) {
             try {
@@ -93,10 +91,10 @@ export class AuthService {
 
                 foto_perfil_url = publicUrl.publicUrl;
             } catch (err) {
-                throw new Error("Error subiendo la foto de perfil: " + err.message);
+                console.error("Error subiendo la foto, se usará la predeterminada:", err.message);
+                foto_perfil_url = "https://kweqoqguupwxgbwavyfb.supabase.co/storage/v1/object/public/foto_usuarios/perfiles/default.jpg";
             }
         }
-
 
         const { data: newUser, error: insertError } = await supabase
             .from('usuario')
@@ -112,7 +110,6 @@ export class AuthService {
             .single();
 
         if (insertError) throw new Error("Error creando usuario en DB: " + insertError.message);
-
 
         return {
             message: 'Usuario registrado. Revisa tu correo para confirmar tu cuenta.',
@@ -148,10 +145,14 @@ export class AuthService {
             .eq("id_usuario", user.id)
             .single();  
 
-        if (profileError) {
+        if (profileError || !profileData) {
             throw new Error("Error obteniendo perfil del usuario");
         }
 
+        if (profileData.estado_cuenta !== "habilitada") {
+            await supabase.auth.signOut();
+            throw new Error("Tu cuenta está deshabilitada. No puedes iniciar sesión.");
+        }
 
         return {
             message: "Login exitoso",

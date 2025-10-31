@@ -234,6 +234,49 @@ export class CampaignService {
 
 
 
+    static async getDonationsByCampaignId(id) {
+        const { data, error } = await supabase
+            .from('donacion')
+            .select(`
+                id_donacion,
+                monto,
+                fecha,
+                id_usuario,
+                usuario (
+                    nombre,
+                    apellido,
+                    foto_perfil
+                )
+            `)
+            .eq('id_campana', id)
+            .order('fecha', { ascending: false });
+
+        if (error) throw new Error(error.message);
+        return data;
+    }
+
+
+    
+    static async getLatestDonationsByCampaign(id) {
+        const { data, error } = await supabase
+            .from('donacion')
+            .select(`
+                id_donacion,
+                monto,
+                fecha,
+                usuario (
+                    nombre,
+                    apellido,
+                    foto_perfil
+                )
+            `)
+            .eq('id_campana', id)
+            .order('fecha', { ascending: false })
+            .limit(3);
+
+        if (error) throw new Error(error.message);
+        return data;
+    }
 
 
 }

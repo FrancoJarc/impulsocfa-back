@@ -12,6 +12,9 @@ router.get('/', CampaignController.getCampaigns);
 // Obtener campaña con estado "pendiente"
 router.get('/pending', authenticate, authorization("administrador"), CampaignController.getPendingCampaigns);
 
+// Obtener las ultimas 3 donaciones de una campaña especifica
+router.get('/latest/:id', authenticate,  CampaignController.getLatestDonations);
+
 // Obtener campaña por ID
 router.get('/:id', CampaignController.getCampaignById);
 
@@ -20,6 +23,10 @@ router.get('/pending/user', authenticate, CampaignController.getUserPendingCampa
 
 // Obtener campañas rechazadas del usuario logueado
 router.get('/rejected/user', authenticate, CampaignController.getUserRejectedCampaigns);
+
+// Obtener las donaciones de una campaña especifica
+router.get('/donation/:id', authenticate, CampaignController.getDonationsByCampaign);
+
 
 // Crear campaña (usuario logueado)
 router.post('/', authenticate, upload.single("foto_principal"), CampaignController.createCampaign);
@@ -32,6 +39,7 @@ router.delete('/:id', authenticate, CampaignController.deleteCampaign);
 
 // Aprobar/rechazar campaña (solo admin)
 router.patch('/:id/approve', authenticate, authorization("administrador"), CampaignController.approveCampaign);
+
 
 
 export default router;

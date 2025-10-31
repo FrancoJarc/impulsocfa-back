@@ -153,4 +153,26 @@ export class CampaignController {
     }
 
 
+    static async getDonationsByCampaign(req, res) {
+        try {
+            const { id } = req.params;
+            const donations = await CampaignService.getDonationsByCampaignId(id);
+            res.status(200).json(donations);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+
+
+    static async getLatestDonations(req, res) {
+        try {
+            const { id } = req.params;
+            const donations = await CampaignService.getLatestDonationsByCampaign(id);
+            res.status(200).json(donations);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
 }

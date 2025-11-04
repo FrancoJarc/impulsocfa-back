@@ -26,9 +26,9 @@ export class CampaignService {
 
     // Crear campaña
     static async createCampaignService(campaignData) {
-        const { id_usuario, id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo, file } = campaignData;
+        const { id_usuario, id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo, files } = campaignData;
 
-        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo || !file) {
+        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo || !files) {
             throw new Error("Todos los campos son obligatorios");
         }
 
@@ -41,7 +41,9 @@ export class CampaignService {
 
         if (!categoria || catError) throw new Error("Categoría inválida");
 
-        const foto_principal = await this.uploadImageToStorage(file);
+        const foto1 = files?.foto1 ? await this.uploadImageToStorage(files.foto1[0]) : null;
+        const foto2 = files?.foto2 ? await this.uploadImageToStorage(files.foto2[0]) : null;
+        const foto3 = files?.foto3 ? await this.uploadImageToStorage(files.foto3[0]) : null;
 
         const { data, error } = await supabase
             .from('campana')
@@ -50,7 +52,9 @@ export class CampaignService {
                 id_categoria,
                 titulo,
                 descripcion,
-                foto_principal: foto_principal || null,
+                foto1,
+                foto2,
+                foto3,
                 tiempo_objetivo,
                 monto_objetivo,
                 monto_actual: 0,
@@ -118,11 +122,11 @@ export class CampaignService {
     }
 
     // Editar campaña
-    static async updateCampaignService(id_campana, campaignData, file) {
+    static async updateCampaignService(id_campana, campaignData, files) {
         // 1️⃣ Obtener la campaña actual (para conocer la imagen vieja)
         const { data: currentCampaign, error: fetchError } = await supabase
             .from('campana')
-            .select('foto_principal')
+            .select('foto1, foto2, foto3')
             .eq('id_campana', id_campana)
             .single();
 
@@ -130,21 +134,23 @@ export class CampaignService {
 
         let updateData = { ...campaignData };
 
-        // 2️⃣ Si hay nueva imagen, borrar la vieja y subir la nueva
-        if (file) {
-            // Si existe imagen anterior, eliminarla del bucket
-            if (currentCampaign?.foto_principal) {
-                try {
-                    const oldPath = currentCampaign.foto_principal.split('/').pop(); // obtener nombre del archivo
-                    await supabaseAdmin.storage.from('campaign-photos').remove([oldPath]);
-                } catch (err) {
-                    console.warn("No se pudo eliminar la imagen anterior:", err.message);
+        // 🟩 Procesar actualización de fotos (hasta 3)        for (const key of ['foto1', 'foto2', 'foto3']) {
+        for (const key of ['foto1', 'foto2', 'foto3']) {
+            if (files?.[key]) {
+                // Borrar imagen vieja si existe
+                if (currentCampaign?.[key]) {
+                    try {
+                        const oldPath = currentCampaign[key].split('/').pop();
+                        await supabaseAdmin.storage.from('campaign-photos').remove([oldPath]);
+                    } catch (err) {
+                        console.warn(`No se pudo eliminar ${key} anterior:`, err.message);
+                    }
                 }
-            }
 
-            // Subir la nueva imagen
-            const newImageUrl = await this.uploadImageToStorage(file);
-            updateData.foto_principal = newImageUrl;
+                // Subir nueva imagen
+                const newImageUrl = await this.uploadImageToStorage(files[key][0]);
+                updateData[key] = newImageUrl;
+            }
         }
 
         // 3️⃣ Actualizar la campaña
@@ -256,7 +262,7 @@ export class CampaignService {
     }
 
 
-    
+
     static async getLatestDonationsByCampaign(id) {
         const { data, error } = await supabase
             .from('donacion')

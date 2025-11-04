@@ -17,7 +17,7 @@ export class CampaignController {
                 descripcion,
                 tiempo_objetivo,
                 monto_objetivo,
-                file: req.file, // la imagen viene en memoria gracias a multer
+                files: req.files,  // viene con foto1, foto2, foto3
             });
 
             return res.status(201).json(campaign);
@@ -71,7 +71,7 @@ export class CampaignController {
             }
 
             // 🔹 Pasamos el file al service directamente
-            const updatedCampaign = await CampaignService.updateCampaignService(id, updateData, req.file);
+            const updatedCampaign = await CampaignService.updateCampaignService(id, updateData, req.files);
 
             return res.status(200).json(updatedCampaign);
         } catch (err) {

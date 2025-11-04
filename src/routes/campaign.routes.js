@@ -29,10 +29,18 @@ router.get('/donation/:id', authenticate, CampaignController.getDonationsByCampa
 
 
 // Crear campaña (usuario logueado)
-router.post('/', authenticate, upload.single("foto_principal"), CampaignController.createCampaign);
+router.post('/', authenticate, upload.fields([
+    { name: "foto1", maxCount: 1 },
+    { name: "foto2", maxCount: 1 },
+    { name: "foto3", maxCount: 1 }
+]), CampaignController.createCampaign);
 
 // Editar campaña (dueño o admin)
-router.put('/:id', authenticate, upload.single("foto_principal"), CampaignController.updateCampaign);
+router.put('/:id', authenticate, upload.fields([
+    { name: "foto1", maxCount: 1 },
+    { name: "foto2", maxCount: 1 },
+    { name: "foto3", maxCount: 1 }
+]), CampaignController.updateCampaign);
 
 // “Eliminar” campaña → cambiar estado a suspendida (dueño o admin)
 router.delete('/:id', authenticate, CampaignController.deleteCampaign);

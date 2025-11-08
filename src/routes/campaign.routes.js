@@ -13,7 +13,7 @@ router.get('/', CampaignController.getCampaigns);
 router.get('/pending', authenticate, authorization("administrador"), CampaignController.getPendingCampaigns);
 
 // Obtener las ultimas 3 donaciones de una campaña especifica
-router.get('/latest/:id', authenticate,  CampaignController.getLatestDonations);
+router.get('/latest/:id',CampaignController.getLatestDonations);
 
 // Obtener campaña por ID
 router.get('/:id', CampaignController.getCampaignById);

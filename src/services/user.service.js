@@ -4,8 +4,18 @@ import supabaseAdmin from "../config/supabaseAdmin.js";
 
 export class UserService {
     static async updateUserService(id_usuario, userData, file) {
-        let foto_perfil_url = userData.foto_perfil || null;
+        let foto_perfil_url;
 
+        const { data: existingUser, error: existingError } = await supabase
+            .from("usuario")
+            .select("foto_perfil")
+            .eq("id_usuario", id_usuario)
+            .single();
+
+        if (existingError) throw new Error("Error obteniendo usuario actual");
+
+        foto_perfil_url = existingUser?.foto_perfil;
+        
         // Si el usuario sube una nueva imagen
         if (file) {
             try {

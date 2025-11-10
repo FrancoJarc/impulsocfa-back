@@ -37,6 +37,10 @@ export class AuthService {
             if (insertError) throw new Error(insertError.message);
             profile = newUser;
             isNewUser = true;
+        } else {
+            if (profile.estado_cuenta !== "habilitada") {
+                throw new Error("Tu cuenta no está habilitada. No puedes iniciar sesión con Google.");
+            }
         }
 
         return {

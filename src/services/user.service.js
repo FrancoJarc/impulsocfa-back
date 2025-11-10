@@ -75,4 +75,33 @@ export class UserService {
     }
 
 
+    static async getTotalDonacionesUsuario(id_usuario) {
+        const { data, error } = await supabase
+            .from("donacion")
+            .select("monto, campana!inner(id_usuario)")
+            .eq("campana.id_usuario", id_usuario);
+
+        if (error) throw new Error(error.message);
+
+        const total = data.reduce((acc, d) => acc + Number(d.monto), 0);
+        return total;
+    }
+
+    // Total recaudado en una campaña específica
+    static async getTotalDonacionesCampana(id_usuario, id_campana) {
+        const { data, error } = await supabase
+            .from("donacion")
+            .select("monto, campana!inner(id_usuario)")
+            .eq("campana.id_usuario", id_usuario)
+            .eq("id_campana", id_campana);
+
+        if (error) throw new Error(error.message);
+
+        const total = data.reduce((acc, d) => acc + Number(d.monto), 0);
+        return total;
+    }
+
+    
+
+
 }

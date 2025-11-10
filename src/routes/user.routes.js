@@ -11,4 +11,8 @@ router.put("/", authenticate, upload.single("foto_perfil"), UserController.updat
 
 router.patch("/disable", authenticate, UserController.disableAccount);
 
+router.get("/total", authenticate, UserController.getTotalDonacionesUsuario);
+
+router.get("/total/:id_campana", authenticate, UserController.getTotalDonacionesCampana);
+
 export default router;

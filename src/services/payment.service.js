@@ -9,10 +9,21 @@ const client = new MercadoPagoConfig({
 });
 
 export class PaymentService {
-    static async createPreference({ amount, campaignTitle, campaignId, userId }) {
+    static async createPreference({ amount, campaignTitle, campaignId, userId, llave_maestra }) {
         try {
+            
+            const { data: user, error: userError } = await supabase
+            .from("usuario")
+            .select("llave_maestra")
+            .eq("id_usuario", userId)
+            .single();
+            
+            if (userError || !user) throw new Error("Usuario no encontrado");
+            if (user.llave_maestra !== llave_maestra) {
+                throw new Error("Llave maestra incorrecta. Verifica tus datos antes de continuar.");
+            }
+            
             const preference = new Preference(client);
-
             const body = {
                 items: [
                     {

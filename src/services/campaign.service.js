@@ -26,11 +26,20 @@ export class CampaignService {
 
     // Crear campaña
     static async createCampaignService(campaignData) {
-        const { id_usuario, id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo, files } = campaignData;
+        const { id_usuario, id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo,alias, llave_maestra, files } = campaignData;
 
-        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo || !files) {
+        if (!id_categoria || !titulo || !descripcion || !monto_objetivo || !tiempo_objetivo || !alias || !llave_maestra || !files) {
             throw new Error("Todos los campos son obligatorios");
         }
+
+        const { data: user, error: userError } = await supabase
+            .from("usuario")
+            .select("llave_maestra")
+            .eq("id_usuario", id_usuario)
+            .single();
+
+        if (userError || !user) throw new Error("Usuario no encontrado");
+        if (user.llave_maestra !== llave_maestra) throw new Error("Llave maestra incorrecta");
 
         // Validar categoría
         const { data: categoria, error: catError } = await supabase
@@ -58,6 +67,7 @@ export class CampaignService {
                 tiempo_objetivo,
                 monto_objetivo,
                 monto_actual: 0,
+                alias,
                 estado: 'pendiente' // siempre pendiente al crear
             }])
             .select()

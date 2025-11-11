@@ -4,11 +4,7 @@ export class CampaignController {
     static async createCampaign(req, res) {
         try {
             const id_usuario = req.user.id; // siempre del token
-            const { id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo } = req.body;
-
-            /*// Convertir id_categoria a número y validar
-            const categoriaId = Number(id_categoria);
-            if (isNaN(categoriaId)) throw new Error("Categoría inválida");*/
+            const { id_categoria, titulo, descripcion, tiempo_objetivo, monto_objetivo, alias, llave_maestra } = req.body;
 
             const campaign = await CampaignService.createCampaignService({
                 id_usuario,
@@ -17,6 +13,8 @@ export class CampaignController {
                 descripcion,
                 tiempo_objetivo,
                 monto_objetivo,
+                alias,
+                llave_maestra ,
                 files: req.files,  // viene con foto1, foto2, foto3
             });
 

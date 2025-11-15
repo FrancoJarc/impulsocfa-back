@@ -42,7 +42,7 @@ export class PaymentController {
             const { amount, campaignTitle, campaignId, llave_maestra } = req.body;
             const userId = req.user.id;
 
-            const result = await PaymentMobileService.createMobilePreference({
+            const result = await PaymentMobileService.createPreferenceMobile({
                 amount,
                 campaignTitle,
                 campaignId,

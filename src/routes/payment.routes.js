@@ -6,8 +6,7 @@ import { authenticate } from '../middlewares/authenticate.js';
 const router = Router();
 
 router.post("/create_preference", authenticate, PaymentController.createPreference);
-
-
+router.post("/mobile/create_preference", authenticate, PaymentController.createPreferenceMobile);
 router.post("/webhook", PaymentController.webhookNotification);
 
 export default router;

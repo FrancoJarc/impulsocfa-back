@@ -36,4 +36,25 @@ export class PaymentController {
         }
     }
 
+
+    static async createPreferenceMobile(req, res) {
+        try {
+            const { amount, campaignTitle, campaignId, llave_maestra } = req.body;
+            const userId = req.user.id;
+
+            const result = await PaymentMobileService.createMobilePreference({
+                amount,
+                campaignTitle,
+                campaignId,
+                userId,
+                llave_maestra,
+            });
+
+            return res.status(200).json(result); // { init_point, preference_id }
+        } catch (error) {
+            console.error("Error mobile createPreference:", error);
+            return res.status(500).json({ error: error.message });
+        }
+    }
+
 }

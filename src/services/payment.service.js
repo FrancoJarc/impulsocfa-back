@@ -137,5 +137,45 @@ export class PaymentService {
     
 
 
+
+    static async createPreferenceMobile({ amount, campaignTitle, campaignId, userId, llave_maestra }) {
+        const { data: user, error: userError } = await supabase
+            .from("usuario")
+            .select("llave_maestra")
+            .eq("id_usuario", userId)
+            .single();
+
+        if (userError || !user) throw new Error("Usuario no encontrado");
+        if (user.llave_maestra !== llave_maestra) {
+            throw new Error("Llave maestra incorrecta");
+        }
+
+        const preference = new Preference(client);
+        const body = {
+            items: [
+                {
+                    title: `Donación a: ${campaignTitle}`,
+                    quantity: 1,
+                    currency_id: "ARS",
+                    unit_price: parseFloat(amount),
+                },
+            ],
+            back_urls: {
+                success: "https://impulsocfa-front.vercel.app/pago-exitoso",
+                failure: "https://impulsocfa-front.vercel.app/pago-fallido",
+                pending: "https://impulsocfa-front.vercel.app/pago-pendiente",
+            },
+            auto_return: "approved",
+            external_reference: JSON.stringify({ campaignId, userId }),
+        };
+
+        const response = await preference.create({ body });
+
+        return {
+            preference_id: response.id,
+            init_point: response.init_point,
+        };
+    }
+
 }
 

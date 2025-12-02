@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { HistoryController } from "../controllers/history.controller.js";
 import { authenticate } from "../middlewares/authenticate.js";
-import { upload } from "../middlewares/upload.middleware.js";
+import { uploadMedia } from "../middlewares/uploadMedia.middleware.js";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.get("/", HistoryController.getAllHistories);
 router.get("/:id", HistoryController.getHistoryWithCampaign);
 
 // Crear historia
-router.post("/",authenticate, upload.fields([
+router.post("/",authenticate, uploadMedia.fields([
         { name: "archivo1", maxCount: 1 },
         { name: "archivo2", maxCount: 1 },
         { name: "archivo3", maxCount: 1 },
@@ -23,7 +23,7 @@ router.post("/",authenticate, upload.fields([
 router.put(
     "/:id_historia",
     authenticate,
-    upload.fields([
+    uploadMedia.fields([
         { name: "archivo1", maxCount: 1 },
         { name: "archivo2", maxCount: 1 },
         { name: "archivo3", maxCount: 1 },

@@ -95,8 +95,11 @@ export class HistoryService {
                 // borrar archivo anterior
                 if (current[key]) {
                     try {
-                        const oldPath = current[key].split("/").pop();
-                        await supabaseAdmin.storage.from("historia_bucket").remove([oldPath]);
+                        const url = current[key];
+                        const cleanUrl = url.split("?")[0];
+                        let fileName = cleanUrl.split("/").pop();
+                        fileName = decodeURIComponent(fileName);
+                        await supabaseAdmin.storage.from("historia_bucket").remove([fileName]);
                     } catch { }
                 }
 
@@ -130,7 +133,10 @@ export class HistoryService {
         for (const key of ["archivo1", "archivo2", "archivo3"]) {
             if (history[key]) {
                 try {
-                    const fileName = history[key].split("/").pop();
+                    const url = history[key];
+                    const cleanUrl = url.split("?")[0];
+                    let fileName = cleanUrl.split("/").pop();
+                    fileName = decodeURIComponent(fileName);
                     await supabaseAdmin.storage
                         .from(bucket)
                         .remove([fileName]);

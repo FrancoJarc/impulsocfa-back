@@ -3,8 +3,8 @@ import { AdminService } from '../services/admin.service.js';
 export class AdminController {
     static async createAdmin(req, res) {
         try {
-            const { email, password, nombre, apellido, fecha_nacimiento, foto_perfil, nacionalidad } = req.body;
-            const admin = await AdminService.createAdminService({ email, password, nombre, apellido, fecha_nacimiento, foto_perfil, nacionalidad });
+            const { email, password, nombre, apellido  } = req.body;
+            const admin = await AdminService.createAdminService({ email, password, nombre, apellido});
             return res.status(201).json(admin);
         } catch (err) {
             console.error(err);

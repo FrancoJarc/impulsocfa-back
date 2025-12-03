@@ -2,8 +2,8 @@ import supabase from '../config/supabase.js';
 
 export class AdminService {
     // Crear un nuevo administrador (auth + registro en tabla usuario)
-    static async createAdminService({ email, password, nombre, apellido, fecha_nacimiento, foto_perfil = null, nacionalidad }) {
-        if (!email || !password || !nombre || !apellido || !nacionalidad) {
+    static async createAdminService({ email, password, nombre, apellido}) {
+        if (!email || !password || !nombre || !apellido) {
             throw new Error('Faltan campos obligatorios');
         }
 
@@ -25,9 +25,6 @@ export class AdminService {
                 id_usuario: authUser.id,
                 nombre,
                 apellido,
-                fecha_nacimiento,
-                foto_perfil,
-                nacionalidad,
                 rol: 'administrador',
                 estado_cuenta: 'habilitada'
             }])

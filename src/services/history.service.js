@@ -28,9 +28,8 @@ export class HistoryService {
         return publicUrl.publicUrl;
     }
 
-
     static async createHistoryService(data) {
-        const { id_usuario, titulo, contenido, id_campana, files } = data;
+        const { id_usuario, titulo, contenido, id_campana, files, tipo } = data;
 
         if (!titulo || !contenido || !id_campana) {
             throw new Error("Faltan campos obligatorios");
@@ -39,6 +38,8 @@ export class HistoryService {
         const archivo1 = files?.archivo1 ? await this.uploadFileToStorage(files.archivo1[0]) : null;
         const archivo2 = files?.archivo2 ? await this.uploadFileToStorage(files.archivo2[0]) : null;
         const archivo3 = files?.archivo3 ? await this.uploadFileToStorage(files.archivo3[0]) : null;
+
+        const fecha_limite = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
 
         const { data: inserted, error } = await supabase
             .from("historia")
@@ -50,6 +51,8 @@ export class HistoryService {
                 archivo1,
                 archivo2,
                 archivo3,
+                tipo: tipo || 'verificacion_50',
+                fecha_limite
             }])
             .select()
             .single();
@@ -75,6 +78,18 @@ export class HistoryService {
             .single();
 
         if (error) throw new Error(error.message);
+        return data;
+    }
+
+
+    static async getHistoriesByCampaignService(id_campana) {
+        const { data, error } = await supabase
+            .from("historia")
+            .select("*")
+            .eq("id_campana", id_campana);
+
+        if (error) throw new Error(error.message);
+
         return data;
     }
 

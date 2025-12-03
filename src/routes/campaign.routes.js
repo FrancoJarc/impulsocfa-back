@@ -46,7 +46,7 @@ router.put('/:id', authenticate, upload.fields([
 router.delete('/:id', authenticate, CampaignController.deleteCampaign);
 
 // Aprobar/rechazar campaña (solo admin)
-router.patch('/:id/approve', authenticate, authorization("administrador"), CampaignController.approveCampaign);
+router.patch('/:id/approve', authenticate, authorization("administrador", "validador"), CampaignController.approveCampaign);
 
 
 

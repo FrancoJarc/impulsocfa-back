@@ -10,6 +10,7 @@ import userRoutes from './routes/user.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import historyRoutes from './routes/history.routes.js';
+import { verificarHistoriasJob } from './jobs/verificarHistoriasJob.js';
 
 // Crear servidor
 const app = express();
@@ -22,10 +23,12 @@ const corsOptions = {
     credentials: true,
 };
 app.use(cors(corsOptions));
-
-
 app.use(express.json());
 
+app.use(async (req, res, next) => {
+    verificarHistoriasJob().catch(console.error);
+    next();
+});
 
 // Rutas
 app.use('/api/auth', authRoutes);
@@ -36,6 +39,7 @@ app.use('/api/user', userRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/history", historyRoutes);
+
 
 // Ruta de prueba
 app.get('/', (req, res) => res.json({ message: 'Servidor funcionando con Supabase' }));

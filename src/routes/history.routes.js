@@ -11,6 +11,10 @@ router.get("/", HistoryController.getAllHistories);
 // Obtener historia + datos de su campaña
 router.get("/:id", HistoryController.getHistoryWithCampaign);
 
+// Obtener todas las historias que tiene una campaña. Puede ser la de 50% o la de 100%
+router.get("/campaign/:id_campana", HistoryController.getHistoriesByCampaign);
+
+
 // Crear historia
 router.post("/",authenticate, uploadMedia.fields([
         { name: "archivo1", maxCount: 1 },

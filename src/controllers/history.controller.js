@@ -41,6 +41,19 @@ export class HistoryController {
         }
     }
 
+
+    static async getHistoriesByCampaign(req, res) {
+        try {
+            const { id_campana } = req.params;
+            const histories = await HistoryService.getHistoriesByCampaignService(id_campana);
+            return res.status(200).json(histories);
+        } catch (err) {
+            return res.status(400).json({ error: err.message });
+        }
+    }
+
+
+    
     static async updateHistory(req, res) {
         try {
             const { id_historia } = req.params;

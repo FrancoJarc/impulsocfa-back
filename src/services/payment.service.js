@@ -126,6 +126,47 @@ export class PaymentService {
                 .update({ monto_actual: nuevoMonto })
                 .eq("id_campana", campaignId);
             
+
+            const porcentaje = (nuevoMonto / campaignData.monto_objetivo) * 100;
+
+            // Revisar si ya existe historia del 50%
+            const { data: historia50 } = await supabase
+                .from("historia")
+                .select("id_historia")
+                .eq("id_campana", campaignId)
+                .eq("tipo", "verificacion_50")
+                .maybeSingle();
+
+            // Revisar si ya existe historia del 100%
+            const { data: historia100 } = await supabase
+                .from("historia")
+                .select("id_historia")
+                .eq("id_campana", campaignId)
+                .eq("tipo", "completada_100")
+                .maybeSingle();
+
+
+            // ✔ Si llegó al 50% y no existe historia
+            if (porcentaje >= 50 && !historia50) {
+                await supabase.from("historia").insert({
+                    id_campana: campaignId,
+                    id_usuario: userId,
+                    titulo: "Verificación del 50%",
+                    contenido: "Debes subir un comprobante de transparencia.",
+                    tipo: "verificacion_50"
+                });
+            }
+
+            // ✔ Si llegó al 100% y no existe historia
+            if (porcentaje >= 100 && !historia100) {
+                await supabase.from("historia").insert({
+                    id_campana: campaignId,
+                    id_usuario: userId,
+                    titulo: "Historia final",
+                    contenido: "Debes subir una actualización final de tu campaña.",
+                    tipo: "verificacion_100",
+                });
+            }
             if (updateError) throw new Error(updateError.message);
 
         } catch (error) {

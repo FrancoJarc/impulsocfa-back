@@ -10,6 +10,7 @@ import userRoutes from './routes/user.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import historyRoutes from './routes/history.routes.js';
+import reportRoutes from './routes/report.routes.js';
 import { verificarHistoriasJob } from './jobs/verificarHistoriasJob.js';
 
 // Crear servidor
@@ -39,6 +40,7 @@ app.use('/api/user', userRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/history", historyRoutes);
+app.use("/api/reports", reportRoutes);
 
 
 // Ruta de prueba

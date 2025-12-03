@@ -72,7 +72,8 @@ export class HistoryService {
             .from("historia")
             .select(`
                 *,
-                campana(*)
+                campana(*),
+                usuario(*)
             `)
             .eq("id_historia", id)
             .single();

@@ -8,7 +8,7 @@ const router = Router();
 // Obtener TODAS las historias
 router.get("/", HistoryController.getAllHistories);
 
-// Obtener historia + datos de su campaña
+// Obtener historia + datos de su campaña + datos del usuario que la creo
 router.get("/:id", HistoryController.getHistoryWithCampaign);
 
 // Obtener todas las historias que tiene una campaña. Puede ser la de 50% o la de 100%

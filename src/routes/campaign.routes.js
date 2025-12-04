@@ -10,7 +10,7 @@ const router = Router();
 router.get('/', CampaignController.getCampaigns);
 
 // Obtener campaña con estado "pendiente"
-router.get('/pending', authenticate, authorization("administrador"), CampaignController.getPendingCampaigns);
+router.get('/pending', authenticate, authorization("administrador", "validador"), CampaignController.getPendingCampaigns);
 
 // Obtener las ultimas 3 donaciones de una campaña especifica
 router.get('/latest/:id',CampaignController.getLatestDonations);

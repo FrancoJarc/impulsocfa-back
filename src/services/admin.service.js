@@ -9,10 +9,12 @@ export class AdminService {
 
         if (password.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres');
 
-        // Crear usuario en Supabase Auth
         const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
-            password
+            password,
+            options: {
+                emailRedirectTo: process.env.EMAIL_REDIRECT_URL
+            }
         });
         if (authError) throw new Error(authError.message);
 

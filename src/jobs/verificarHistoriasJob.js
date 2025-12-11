@@ -9,8 +9,6 @@ export async function verificarHistoriasJob() {
             .select("id_historia, id_usuario, id_campana, fecha_limite")
             .eq("tipo", "verificacion_100")
             .eq("verificado", false)
-            .eq("titulo", "Historia final")
-            .eq("contenido", "Debes subir una actualización final de tu campaña.");
 
         if (error) throw error;
 

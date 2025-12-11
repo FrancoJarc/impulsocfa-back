@@ -26,10 +26,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use(async (req, res, next) => {
-    verificarHistoriasJob().catch(console.error);
-    next();
-});
 
 // Rutas
 app.use('/api/auth', authRoutes);

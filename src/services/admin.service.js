@@ -113,8 +113,9 @@ export class AdminService {
         const { data, error } = await supabase
             .from('usuario')
             .select('*')
-            .eq('rol', 'administrador');
-
+            .eq('rol', 'administrador')
+            .eq('estado_cuenta', 'habilitada');
+        
         if (error) throw new Error(error.message);
         return data;
     }
